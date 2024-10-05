@@ -1,18 +1,30 @@
 <template>
     <footer>
       <ul class="social-icons">
-        <li><a href="#"><i class="bi bi-facebook text-primary"></i></a></li>
-        <li><a href="#"><i class="bi bi-instagram text-danger"></i></a></li>
-        <li><a href="#"><i class="bi bi-twitter-x text-info"></i></a></li>
-        <li><a href="#"><i class="bi bi-github"></i></a></li>
-        <li><a href="#"><i class="bi bi-youtube text-danger"></i></a></li>
+        <li><a href="https://www.facebook.com/doanchinhit2102" target="_blank"><i class="bi bi-facebook text-primary"></i></a></li>
+        <li><a href="#" target="_blank"><i class="bi bi-instagram text-danger"></i></a></li>
+        <li><a href="#" target="_blank"><i class="bi bi-twitter-x text-info"></i></a></li>
+        <li><a href="#" target="_blank"><i class="bi bi-github"></i></a></li>
+        <li><a href="#" target="_blank"><i class="bi bi-youtube text-danger"></i></a></li>
       </ul>
       <ul class="footer-nav">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Team</a></li>
-        <li><a href="#">Project</a></li>
-        <li><a href="#">Progress</a></li>
-        <li><a href="#">Zoom</a></li>
+        <li class="nav-item">
+            <router-link class="nav-link text-white" to="/">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/team">Team</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/project">
+              Project
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/progress">Progress</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/zoom">Zoom</router-link>
+          </li>
       </ul>
       <p class="footer-text">Copyright ©2024, Designed by Duy Chinh</p>
     </footer>

@@ -22,12 +22,9 @@
           <li class="nav-item">
             <router-link class="nav-link text-white" to="/progress">Progress</router-link>
           </li>
-          <router-link class="nav-item">
-            <a class="nav-link text-white" to="/rank">Zoom</a>
-          </router-link>
-          <!-- <li class="nav-item">
-            <a class="nav-link text-white" href="#">Blog</a>
-          </li> -->
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/zoom">Zoom</router-link>
+          </li>
         </ul>
         <div class="d-flex">
           <a target="_blank" href="https://github.com/jnp2018/mid-project-419084084" class="me-4 text-white">
@@ -49,9 +46,8 @@
 </template>
 
 <script setup>
-import duck from "../assets/img/duck.png"
+import duck from "../assets/img/duck-toy.png"
 </script>
-
 <style lang="scss" scoped>
 .navbar {
   background-color: #6f42c1; 

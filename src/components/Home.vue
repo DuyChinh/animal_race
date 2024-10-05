@@ -11,15 +11,12 @@
         <div>
             <img :src="logo" alt="logo" class="logo">
         </div>
-        <button type="button" class="play-btn">PLAY NOW</button>
+        <router-link to="/zoom" class="play-btn">PLAY NOW</router-link>
         <div class="mt-5 d-flex flex-column gap-3">
         <div class="animate">
             <img :src="dog" class="icon animate-dog" alt="">
             <img :src="duck" class="icon animate-duck" alt="">
         </div>
-            <!-- <img :src="dog" class="icon animate-duck" alt="">
-            <img :src="camel" class="icon animate-duck" alt="">
-            <img :src="turtle" class="icon animate-duck" alt=""> -->
 
         </div>
     </div>
@@ -59,13 +56,15 @@ import logo from "../assets/img/logo_2 .webp"
 
 
 .play-btn {
+    display: inline-block;
     margin-top: 40%;
     padding: 15px 50px;
     border-radius: 8px;
     border: 2px solid #fff;
     background: #FF512F;
     color: #fff;
-    animation: blink 1.5s infinite alternate; /* Add the animation */
+    animation: blink 1.5s infinite alternate; 
+    text-decoration: none;
 }
 
 .animate {

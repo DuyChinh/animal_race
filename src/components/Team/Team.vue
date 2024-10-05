@@ -43,7 +43,7 @@ import hiepImg from "../../assets/img/hiep_n.jpg"
 
 <style lang="scss" scoped>
 .team-section {
-// background-color: #f9f9f9; 
+    height: calc(100vh - 80px);
 }
 
 .team-title {

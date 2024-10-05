@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../components/Home.vue'
 import Team from '../components/Team/Team.vue'
+import Zoom from '../components/Zoom/Zoom.vue'
+import Progress from '../components/Progress/Progress.vue'
+import Project from '../components/Project/Project.vue'
 
 const routes = [
   {
@@ -12,6 +15,21 @@ const routes = [
     path: '/team',
     name: 'Team',
     component: Team
+  },
+  {
+    path: '/zoom',
+    name: 'Zoom',
+    component: Zoom
+  },
+  {
+    path: '/project',
+    name: 'Project',
+    component: Project
+  },
+  {
+    path: '/progress',
+    name: 'Progress',
+    component: Progress
   }
 ]
 
