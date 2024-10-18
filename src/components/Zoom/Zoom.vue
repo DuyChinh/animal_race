@@ -3,8 +3,8 @@
 
         <div class="zoom mt-2">
             <div class="d-flex justify-content-between">
-                <p class="text-info mx-3" style="font-size: 22px; font-weight: 600">Hello, {{ nickname }}</p>
-                <span class="badge rounded-pill text-bg-warning text-white" style="min-width: 80px; max-height: 30px; font-size: 18px;" @click="showModal = true"><i class="bi bi-pencil-square"></i> Set name</span>
+                <p class="text-info mx-3" style="font-size: 22px; font-weight: 600">Hello, {{ nickname ? nickname : "Player" }}</p>
+                <span class="badge rounded-pill text-bg-warning text-white" style="min-width: 80px; max-height: 30px; font-size: 18px; cursor: pointer" @click="showModal = true"><i class="bi bi-pencil-square"></i> Set name</span>
             </div>
             <div class="card" style="">
                 <div class="card-body">
