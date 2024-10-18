@@ -49,13 +49,13 @@
                         RANKING
                         <img :src="rank" class="card-img-top icon_race" alt="...">
                     </h5>
-                    <p class="card-text d-flex gap-5" v-for="(user, index) in users" :key="index">
+                    <p class="card-text d-flex gap-5" v-for="(user, index) in players" :key="index">
                         <span class="text-warning" style="font-weight: 600;">
                             <span class="text-danger">#{{ index + 1}}.</span>
                             {{ user.name }} 
                         </span>
                         <!-- <span class="text-danger">{{ user.coin }}</span> -->
-                        <span class="badge rounded-pill text-bg-info text-white">{{ user.coin }}</span>
+                        <span class="badge rounded-pill text-bg-info text-white">{{ user.points }}</span>
                     </p>
                     <!-- <a href="#" class="btn btn-warning">Join zoom</a> -->
                 </div>
@@ -65,12 +65,56 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import duck from "../../assets/img/duck-toy.png"
 import turtle from "../../assets/img/turtle.png"
 import camel from "../../assets/img/camel _2.png"
 import dog from "../../assets/img/dog.png"
 import rank from "../../assets/img/ranking.png"
+
+const players = ref([]);
+
+const filterPlayers = (arr) => {
+    sendMessageToServer();
+    const res = [];
+    arr = JSON.parse(arr);
+    for (let i = 0; i < arr.length; i++) {
+        if(arr[i]) {
+            res.push(arr[i]);
+        }
+    }    
+    return res;
+}
+
+const socket = new WebSocket('wss://pure-caverns-67534-35c6a327ed88.herokuapp.com/duckRace');
+socket.addEventListener('open', function (event) {
+    console.log('Connected to WebSocket server');
+});
+
+socket.addEventListener('message', function (event) {
+    players.value = filterPlayers(event.data);
+});
+
+
+socket.addEventListener('close', function (event) {
+    console.log('WebSocket connection closed');
+});
+
+function sendMessageToServer(message) {
+    if (socket.readyState === WebSocket.OPEN) {
+        console.log("Sending message to server...");
+
+        // Gửi tin nhắn dưới dạng chuỗi
+        socket.send("SET_NAME:Chinhdz");
+    } else {
+        console.error('WebSocket is not open');
+    }
+}
+
+
+// Example usage:
+// sendMessageToServer({ type: 'joinRace', playerName: 'Player 1' });
+
 
 const users = ref([
     {
@@ -86,6 +130,7 @@ const users = ref([
         coin: "1200"
     },
 ])
+
 </script>
 
 <style lang="scss" scoped>
