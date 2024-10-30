@@ -1,12 +1,13 @@
 <template>
     <div class="zoom_duck">
-        <!-- <h1>Duck race</h1> -->
-        <!-- <video autoplay muted loop class="background_video">
-            <source src="../../assets/video/river.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video> -->
-        <button class="btn btn-warning btn-bet" @click="showModal = true" v-if="remainTime >=0">Set bet</button>
-        <p class="remain_time" v-if="remainTime >= 0">{{ remainTime }}</p>
+        <button class="btn btn-warning btn-bet" @click="showModal = true" v-if="remainTime > 1">Set bet</button>
+        <p class="remain_time" v-if="remainTime > 1 && statusRace == 'pending'">{{ remainTime }}</p>
+        <img v-if="remainTime <= 1 && statusRace == 'pending'" :src="progress" class="card-img-top icon_progress" alt="..."> 
+        <img v-if="remainTime > 24 && statusRace == 'loss'" :src="loss" class="card-img-top icon_progress" alt="..."> 
+        <img v-if="remainTime > 24 && statusRace == 'win'" :src="win" class="card-img-top icon_progress" alt="..."> 
+
+
+        
         <p class="point">
             <img :src="wallet" class="card-img-top icon-point" alt="...">
             wallet: <strong class="text-warning">{{ point }}</strong> 
@@ -14,31 +15,38 @@
         </p>
 
         <div class="d-flex flex-column duck_block">
-            <div class="duck_parent">
+            <div v-for="(duck, index) in ducks" :key="index" class="duck_parent" :style="{ animationDuration: duck.duration + 's' }" :class="{ running: ducksRunning }">
+                <img :src="duck.image" class="card-img-top icon_race" alt="...">
+                <span class="duck_num">{{ index + 1 }}</span>
+            </div>
+        </div>
+
+        <!-- <div class="d-flex flex-column duck_block">
+            <div class="duck_parent" :class="{ running: ducksRunning }">
                 <img :src="duck" class="card-img-top icon_race" alt="..."> 
                 <span class="duck_num">1</span>
             </div>
     
-            <div class="duck_parent">
+            <div class="duck_parent" :class="{ running: ducksRunning }">
                 <img :src="duck" class="card-img-top icon_race" alt="..."> 
                 <span class="duck_num">2</span>
             </div>
 
-            <div class="duck_parent">
+            <div class="duck_parent" :class="{ running: ducksRunning }">
                 <img :src="duck" class="card-img-top icon_race" alt="..."> 
                 <span class="duck_num">3</span>
             </div>
 
-            <div class="duck_parent">
+            <div class="duck_parent" :class="{ running: ducksRunning }">
                 <img :src="duck" class="card-img-top icon_race" alt="..."> 
                 <span class="duck_num">4</span>
             </div>
 
-            <div class="duck_parent">
+            <div class="duck_parent" :class="{ running: ducksRunning }">
                 <img :src="duck" class="card-img-top icon_race" alt="..."> 
                 <span class="duck_num">5</span>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <div class="modal modal-overlay" :class="{ show: showModal }"  aria-labelledby="exampleModalLabel" aria-hidden="true" tabindex="-1" style="display: block" v-if="showModal">
@@ -83,14 +91,26 @@
 import duck from "../../assets/img/duck-toy.png"
 import dollar from "../../assets/img/dollar.png"
 import wallet from "../../assets/img/wallet.png"
+import progress from "../../assets/img/game_progress_white_bg.png"
+import loss from "../../assets/img/loss.png"
+import win from "../../assets/img/win.png"
 import { ref, watch } from "vue";
+import { toast } from "vue3-toastify"
+import router from "../../router"
 const duck_select = ref();
 const amount = ref();
 const showModal = ref(false);
 const remainTime = ref(0);
-const statusRace = ref(false);
+const statusRace = ref("pending");
 const point = ref();
+const ducksRunning = ref(false);
 const player_id = localStorage.getItem("player_id");
+const ducks = ref(
+  Array.from({ length: 5 }, () => ({
+    image: duck,
+    duration: Math.random() * 5 + 10, 
+  }))
+);
 const socket = new WebSocket(`wss://pure-caverns-67534-35c6a327ed88.herokuapp.com/duckRace/race?playerId=${player_id}`);
 socket.addEventListener('open', function (event) {
     console.log('Connected to WebSocket server duckRace/race');
@@ -98,47 +118,44 @@ socket.addEventListener('open', function (event) {
 
 socket.addEventListener('message', function (event) {
     console.log(event.data);
-    
-    const type = event.data.split(",")[0].split(":")[1].trim();
-    const time = event.data.split(",")[1].split(":")[1];
-    remainTime.value = time.substring(0, time.length - 1);
-    if(remainTime.value > 30) {
-        // console.log("points", remainTime.value);
-        
-        point.value = remainTime.value;
+    if(JSON.parse(event.data).type === "timer") {
+       remainTime.value = JSON.parse(event.data).remainingTime;
+       if(remainTime.value === 1) {
+           ducksRunning.value = true;
+       }
+
+       if(remainTime.value < 30 && remainTime.value > 1) {
+           ducksRunning.value = false;
+       }
+
+       if(remainTime.value == 25) {
+        statusRace.value = "pending";
+       }
+    } else if(JSON.parse(event.data).type === "points") {        
+        point.value = JSON.parse(event.data).points;
+    } else if(JSON.parse(event.data).type === "noWinners") {
+        statusRace.value = "loss";
+    }  else if(JSON.parse(event.data).type === "raceFinished") {
+        statusRace.value = "win";
+    } else if(JSON.parse(event.data).type === "playerUpdate") {
+        const player =  JSON.parse(event.data).players.find(player => player.id === player_id);
+        if (player) {
+            point.value = player.points;
+        }e
+    } else if(JSON.parse(event.data).type === "error") {
+        toast.error("Player banned!Please Join zoom again!!!");
+        setTimeout(() => {
+            router.push("/zoom");
+        }, 3000);
+    } else {
+        console.log("no non nonono");
     }
-    // console.log("type= ",type);
     
-    // if(type.toString() === "timer") {
-    //     console.log("time in");
-        
-    //     console.log("time: ",time);
-        
-    // } else if(type === "points") {        
-    //     const amount = event.data.split(",")[1].split(":")[1];
-    //     point.value = amount.substring(0, amount.length - 1);
-    //     console.log(point.value);
-        
-    // } else {
-    //     console.log("type: ", typeof(type));
-        
-    //     console.log("no non nonono");
-        
-    // }
 });
 
 const closeModal = () => {
     showModal.value = false;
 }
-
-// watch(remainTime, (newValue) => {
-//     console.log("time: ", newValue);
-
-//     if(newValue === 1) {
-//         // showModal.value = false;
-//         closeModal();
-//     }
-// });
 
 function setBet(duck_select, amount) {
     if (socket.readyState === WebSocket.OPEN) {
@@ -149,8 +166,10 @@ function setBet(duck_select, amount) {
             "amount": amount,
         }
         socket.send(JSON.stringify(sendInfo));
+        toast.success(`Set bet ${amount}$ vs number ${duck_select} successfully!`);
     } else {
         console.error('WebSocket is not open');
+        toast.success("Set bet fail! Please try again!");
     }
     showModal.value = false;
 }
@@ -195,8 +214,8 @@ function setBet(duck_select, amount) {
 
 .btn-bet {
     position: absolute;
-    top: 10;
-    left: 48%;
+    top: 0;
+    left: 0;
 }
 
 .zoom_duck {
@@ -211,25 +230,20 @@ function setBet(duck_select, amount) {
 }
 
 .remain_time {
-    width: 50px;
-    height: 50px;
+    position: absolute;
+    top: 10px;
+    left: 48%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     color: #fff;
-    font-size: 20px;
+    font-size: 24px;
     background: #000;
     text-align: center;
-    line-height: 50px;
+    line-height: 70px;
 }
 
-/* .background_video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1; /* Keeps the video behind the content 
-} */
 
 .modal-overlay {
   position: fixed;
@@ -250,4 +264,58 @@ function setBet(duck_select, amount) {
     height: 95px;
     object-fit: cover;
 }
+
+.icon_progress {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 12px;
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+@keyframes moveDuck {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100vw);
+    }
+}
+
+.duck_parent {
+    position: relative;
+    transform: translateX(0); 
+}
+
+.duck_parent.running {
+    /* animation: moveDuck 10s linear forwards;  */
+    animation: moveDuck linear forwards; 
+
+}
+
+/* .duck_parent:nth-child(1) {
+    animation-delay: 2s;
+}
+
+.duck_parent:nth-child(2) {
+    animation-delay: 1.5s;
+}
+
+.duck_parent:nth-child(3) {
+    animation-delay: 1s;
+}
+
+.duck_parent:nth-child(4) {
+    animation-delay: 2.5s;
+}
+
+.duck_parent:nth-child(5) {
+    animation-delay: 3s;
+} */
+
+
 </style>

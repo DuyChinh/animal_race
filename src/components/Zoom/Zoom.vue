@@ -62,15 +62,11 @@
                             <span>#{{ index + 1}}.</span>
                             {{ user.name }} 
                         </span>
-                        <!-- <span class="text-danger">{{ user.coin }}</span> -->
                         <span class="badge rounded-pill text-bg-info text-white d-flex gap-1" style="min-width: 80px; max-height: 30px; font-size: 18px;">
                             {{ user.points }} 
                             <img :src="dollar" class="card-img-top icon-point" alt="...">
                         </span>
-                       
-
                     </p>
-                    <!-- <a href="#" class="btn btn-warning">Join zoom</a> -->
                 </div>
             </div>
         </div>
@@ -121,20 +117,7 @@ const players = ref([]);
 const showModal = ref(false);
 const nickname = ref("");
 const cnt = 0;
-
 const ip = ref("");
-
-// onMounted(async () => {
-//   try {
-//     const response = await fetch('https://api64.ipify.org?format=json');
-//     const data = await response.json();
-//     ip.value = data.ip;
-//     // console.log("ip: ", ip.value);
-//     localStorage.setItem("user_ip", ip.value);
-//   } catch (error) {
-//     console.error('Error fetching IP:', error);
-//   }
-// });
 
 const closeModal = () => {
     showModal.value = false;
@@ -143,8 +126,6 @@ const closeModal = () => {
 const filterPlayers = (arr) => {
     const res = [];
     arr = JSON.parse(arr);
-    // console.log("arr= ", arr);
-    
     for (let i = 0; i < arr.length; i++) {
         if(arr[i]) {
             res.push(arr[i]);
@@ -153,23 +134,7 @@ const filterPlayers = (arr) => {
     return res;
 }
 
-
-function updatePlayerPoints(players, newPlayerData) {
-    const player = players.find(p => p.id === newPlayerData.id);
-    if (player) {
-        player.points = newPlayerData.points;
-    } else {
-        players.push(newPlayerData);
-    }
-    players.value = players;
-}
-
-
 const socket = new WebSocket('wss://pure-caverns-67534-35c6a327ed88.herokuapp.com/duckRace');
-// socket.addEventListener('open', function (event) {
-//     console.log('Connected to WebSocket server');
-// });
-
 socket.addEventListener('message', function (event) {
     console.log(event.data);
     if(event.data.startsWith("PLAYER_ID")) {
@@ -177,17 +142,8 @@ socket.addEventListener('message', function (event) {
         
         localStorage.setItem("player_id", event.data.split(":")[1]);
     } else {
-        // console.log(event.data.split(",")[0]);
         const users = JSON.parse(event.data);
-        // console.log("users: ", users);
         players.value = users.players.sort((a, b) => b.points - a.points);
-        
-        
-        // players.value = filterPlayers(event.data.split(",")[0].split(":")[1]);
-        // if(players.length > 1) {
-        //     players.value = players;
-        // }
-        console.log("players: ", players.value);
     }
 });
 
@@ -205,22 +161,6 @@ function renameAction(nickname) {
     }
     showModal.value = false;
 }
-
-
-const users = ref([
-    {
-        name: "Player1",
-        coin: "2000"
-    },
-    {
-        name: "Player2",
-        coin: "1500"
-    },
-    {
-        name: "Player3",
-        coin: "1200"
-    },
-])
 
 </script>
 
